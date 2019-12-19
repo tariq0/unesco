@@ -1,75 +1,107 @@
-
 const multer = require("multer");
-const isStringInArray = require("./string-in-array");
+const isStringInArray = require("../../../services/string-in-array");
 const config = require("config");
-const {deleteFiles} = require('../services/filesystem');
+const { deleteFiles , deleteFile} = require("../../../services/filesystem");
 
+const imageMimeType = config.get("static.suppportedImgMimeType");
+const documentMimeType = config.get("static.suppportedDocMimeType");
+const imageDir = config.get("publication.staticImgDir");
+const documentDir = config.get("publication.staticDocDir");
+const imageFieldName = config.get("publication.imgFieldName");
+const documentFieldName = config.get("publication.docFieldName");
 
-const imageStorage = multer.diskStorage({
+const filesStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, config.get("static.staticImgDir"));
+    if (isStringInArray(file.mimetype, imageMimeType)) {
+      cb(null, imageDir);
+    } else if (isStringInArray(file.mimetype, documentMimeType)) {
+      cb(null, documentDir);
+    }
   },
   filename: function(req, file, cb) {
     cb(null, new Date().toISOString() + file.originalname);
   }
 });
 
-const imageFilter = (req, file, cb) => {
+const filesFilter = (req, file, cb) => {
   //cb(null, true) to accept that file
   if (
-    isStringInArray(file.mimetype, config.get("static.suppportedImgMimeType"))
+    isStringInArray(file.mimetype, imageMimeType) ||
+    isStringInArray(file.mimetype, documentMimeType)
   ) {
     cb(null, true);
+  } else {
+    cb(new Error("unsupported file MIME type"));
   }
-    //cb(null, false) to rejectc it
-    //cb(new Error("I don't have a clue!"));
 };
 
 // to make upload functionality totally separate
 // i used save middleware to handle that.
-function imageSave(req, res, next){
-   
-  if(req.files){
-    let images = [];
-    req.files.forEach(file =>{
-        images.push(file.filename);
-    });
-    req.body[config.get('static.imgFieldName')] = images;
-    //console.log(req.body.images ,req.files);
+function filesSave(req, res, next) {
+  if (req.files) {
+
+    let image = undefined;
+    let documents = undefined;
+
+    if(req.files[imageFieldName]){
+      image = req.files[imageFieldName][0].filename;
+    }
+    
+    //console.log(req.files[documentFieldName]);
+    if(req.files[documentFieldName]){
+      
+      documents = [];
+      req.files[documentFieldName].forEach(file => {
+        documents.push(file.filename);
+      });
+    }
+    
+    req.body[imageFieldName] = image;
+    req.body[documentFieldName] = documents;
+    
+    //console.log(req.body.image, req.body.documents ,req.files);
     next();
-  }else{
+  } else {
     // if he send json with image extension but no file
     // we should  stop that bug.
-    if(req.body.images) req.body.images = ['bad value'];
-    else req.body.images = undefined;
+    if (req.body[imageFieldName] || req.body[documentFieldName]) {
+      res.statusCode = 422;
+      const error = new Error();
+      error.name = "ValidationError";
+      error.message = "invalid image or file input.";
+      return next(error);
+    }
+    //console.log(req.files);
     next();
   }
-  //console.log('image save is called',req.files);
-    
 }
 
-const uploadImage = multer({
-  storage: imageStorage,
-  fileFilter: imageFilter
+const uploadFiles = multer({
+  storage: filesStorage,
+  fileFilter: filesFilter
 });
 
-
-async function clearImages(req) {
+async function clearFiles(req) {
   // passed as call back for validator to remove
   // saved files if the req is not valid.
   //console.log('clear image is called');
-  if(req.files){
-    let images = req.files.map(file => file.filename);
-  //console.log(req.files);
-  await deleteFiles( config.get('static.staticImgDir'), images);
+  if (req.files) {
+    //console.log(req.files);
+    let documents = req.body[documentFieldName];
+    let image = req.body[imageFieldName];
+    //files = files.concat([req.body[imageFieldName]]);
+    await deleteFile(imageDir, image);
+    await deleteFiles(documentDir, documents);
   }
-  
 }
 
 module.exports = {
-  uploadImage: [
-      uploadImage.array(config.get('static.imgFieldName')),
-      imageSave
-    ],
-    clearImages: clearImages
+  uploadFiles: [
+    uploadFiles.fields([
+      { name: imageFieldName, maxCount: 1 },
+      { name: documentFieldName }
+    ]),
+    filesSave
+  ],
+  clearFiles: clearFiles
 };
