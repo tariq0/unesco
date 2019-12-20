@@ -1,65 +1,73 @@
-{   
-    "google":{
-        "clientID":"",
-        "clientSecret": "",
-        "callbackURL": "http://localhost:3000/auth/google/callback"
-    },
-    "mail":{
-        "options":{
-            "host":"smtp.gmail.com",
-            "secure":true,
-            "port":"465",
-            "auth":{
-                "user":"unescobackend@gmail.com",
-                "pass":"backend@6789"
-            }
-        }
-    },
-    "mongodb":{
-        "host":"mongodb://127.0.0.1:27017/unesco",
-        "settings":{
-            "useNewUrlParser": true,
-            "useUnifiedTopology": true, 
-            "useFindAndModify": false, 
-            "useCreateIndex": true
-        },
-        "databaseName":""
-    },
-    "jwt":{
-        "secret": "secret",
-        "options":{
-            "expiresIn":"1h"
-        }
-    },
-    "bcrypt":{
-        "saltRounds":10
-    },
-    "photoalbum":{
-        "staticImgDir" :"./public/photos",
-        "staticImgUrl" :"/photos/",
-        "imgFieldName" : "images"
-    },"news":{
-        "staticImgDir" :"./public/photos",
-        "staticImgUrl" :"/photos/",
-        "staticDocDir" :"./public/documents",
-        "staticDocUrl" : "/documents/",
-        "imgFieldName" : "images",
-        "docFieldName" : "files"
-    },
-    "publication":{
-        "staticImgDir" :"./public/photos",
-        "staticImgUrl" :"/photos/",
-        "staticDocDir" :"./public/documents",
-        "staticDocUrl" : "/documents/",
-        "imgFieldName" : "image",
-        "docFieldName" : "documents"
+{
+  "google": {
+    "clientID": "",
+    "clientSecret": "",
+    "callbackURL": "http://localhost:3000/auth/google/callback"
+  },
+  "mail": {
+    "options": {
+      "host": "smtp.gmail.com",
+      "secure": true,
+      "port": "465",
+      "auth": {
+        "user": "unescobackend@gmail.com",
+        "pass": "backend@6789"
+      }
     }
-    ,"static":{
-        "staticRootDir": "./public",
-        "suppportedImgMimeType" : ["image/png", "image/jpg", "image/jpeg"],
-        "suppportedDocMimeType" : ["application/pdf"]
-    },"pagination":{
-        "maxPerPage":10,
-        "defaultPerPage":5
+  },
+  "mongodb": {
+    "host": "mongodb://127.0.0.1:27017/unesco",
+    "settings": {
+      "useNewUrlParser": true,
+      "useUnifiedTopology": true,
+      "useFindAndModify": false,
+      "useCreateIndex": true
+    },
+    "databaseName": ""
+  },
+  "jwt": {
+    "secret": "secret",
+    "options": {
+      "expiresIn": "1h"
     }
+  },
+  "bcrypt": {
+    "saltRounds": 10
+  },
+  "photoalbum": {
+    "staticImgDir": "./public/photos",
+    "staticImgUrl": "/photos/",
+    "imgFieldName": "images"
+  },
+  "news": {
+    "staticImgDir": "./public/photos",
+    "staticImgUrl": "/photos/",
+    "staticDocDir": "./public/documents",
+    "staticDocUrl": "/documents/",
+    "imgFieldName": "image",
+    "docFieldName": "documents",
+
+    "suppportedDocMimeType": [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ]
+  },
+  "publication": {
+    "staticImgDir": "./public/photos",
+    "staticImgUrl": "/photos/",
+    "staticDocDir": "./public/documents",
+    "staticDocUrl": "/documents/",
+    "imgFieldName": "image",
+    "docFieldName": "documents"
+  },
+  "static": {
+    "staticRootDir": "./public",
+    "suppportedImgMimeType": ["image/png", "image/jpg", "image/jpeg"],
+    "suppportedDocMimeType": ["application/pdf"]
+  },
+  "pagination": {
+    "maxPerPage": 10,
+    "defaultPerPage": 5
+  }
 }

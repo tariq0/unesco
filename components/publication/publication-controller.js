@@ -20,7 +20,6 @@ async function getAll(req, res, next) {
     const { pagination, data } = await getItemsPaginated(
       Publication,
       {},
-      {},
       "",
       page,
       perPage

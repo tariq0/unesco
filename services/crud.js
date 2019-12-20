@@ -1,14 +1,14 @@
 //
-const config = require('config');
+const config = require("config");
 
-
-async function getItems(Model, filter, order, select){
+async function getItems(Model, filter, order, select) {
   const result = await Model.find(filter)
-  .order(order)
-  .select(select);
+    .sort(order)
+    .select(select);
+  return result;
 }
 
-async function getItemsPaginated(Model, filter, order, select, page, perPage) {
+async function getItemsPaginated(Model, order, select, page, perPage) {
   // when getting all items it should be paginated.
 
   if (page <= 0) {
@@ -25,14 +25,83 @@ async function getItemsPaginated(Model, filter, order, select, page, perPage) {
   }
   // setting main arguments to default if not given.
   if (!page) page = 1;
-  if (!perPage) perPage = config.get('pagination.defaultPerPage');
-  
-  const numberOfDocs = await Model.estimatedDocumentCount(filter);
+  if (!perPage) perPage = config.get("pagination.defaultPerPage");
+
+  const numberOfDocs = await Model.estimatedDocumentCount();
   //console.log(numberOfDocs);
   if (!numberOfDocs) {
     return {
       pagination: {
-        perPage:perPage,
+        perPage: perPage,
+        page: 1,
+        numberOfPages: 1,
+        nextState: false,
+        previousState: false
+      },
+      data: []
+    };
+  }
+
+  const numberOfPages = Math.ceil(numberOfDocs / perPage);
+  const skip = (page - 1) * perPage;
+
+  if (page > numberOfPages) {
+    let error = new Error();
+    error.message = `page ${page} is not found`;
+    error.name = "NotFoundError";
+    throw error;
+  }
+
+  const docs = await Model.find()
+    .select(select)
+    .skip(skip)
+    .limit(perPage)
+    .sort(order);
+
+  return {
+    pagination: {
+      perPage: perPage,
+      page: page,
+      numberOfPages: numberOfPages,
+      nextState: numberOfPages > page ? true : false,
+      previousState: page > 1 ? true : false
+    },
+    data: docs
+  };
+}
+
+async function getItemsPaginatedAndFiltered(
+  Model,
+  filter,
+  order,
+  select,
+  page,
+  perPage
+) {
+  // when getting all items it should be paginated.
+
+  if (page <= 0) {
+    let error = new Error();
+    error.message = "page cant be negative or zero";
+    error.name = "ValidationError";
+    throw error;
+  }
+  if (perPage > config.get("pagination.maxPerPage")) {
+    let error = new Error();
+    error.message = "exceeding max number per page.";
+    error.name = "ValidationError";
+    throw error;
+  }
+  // setting main arguments to default if not given.
+  if (!page) page = 1;
+  if (!perPage) perPage = config.get("pagination.defaultPerPage");
+
+  const numberOfDocs = await Model.countDocuments(filter);
+  //console.log(numberOfDocs);
+  if (!numberOfDocs) {
+    return {
+      pagination: {
+        perPage: perPage,
         page: 1,
         numberOfPages: 1,
         nextState: false,
@@ -60,7 +129,7 @@ async function getItemsPaginated(Model, filter, order, select, page, perPage) {
 
   return {
     pagination: {
-      perPage:perPage,
+      perPage: perPage,
       page: page,
       numberOfPages: numberOfPages,
       nextState: numberOfPages > page ? true : false,
@@ -69,7 +138,6 @@ async function getItemsPaginated(Model, filter, order, select, page, perPage) {
     data: docs
   };
 }
-
 
 async function getItemBy(Model, filter, select) {
   return await Model.findOne(filter).select(select);
@@ -88,6 +156,15 @@ async function getItemIfExist(Model, filter, select) {
   }
 }
 
+async function getFilteredItemsCount(Model, filter) {
+  const count = await Model.countDocuments(filter);
+  return count;
+}
+
+async function getItemsCount(Model) {
+  const count = await Model.estimatedDocumentCount();
+  return count;
+}
 
 async function createInstance(Model, data) {
   const instance = new Model(data);
@@ -110,7 +187,7 @@ async function getAndUpdateInstance(Model, id, data) {
   return item;
 }
 
-async function updateInstance(Model, filter, data){
+async function updateInstance(Model, filter, data) {
   // updates document directly in data base
   const result = await Model.updateOne(filter, data);
   return result;
@@ -212,12 +289,15 @@ async function delteEmbeddedDocument(
 }
 
 module.exports = {
-  // get 
+  // get
   getItems: getItems,
   getItemsPaginated: getItemsPaginated,
+  getItemsPaginatedAndFiltered: getItemsPaginatedAndFiltered,
   getItemBy: getItemBy,
   getItemIfExist: getItemIfExist,
-  
+  getItemsCount: getItemsCount,
+  getFilteredItemsCount: getFilteredItemsCount,
+
   //checkItemIfExist: checkItemIfExist,
   // create
   createInstance: createInstance,
@@ -227,7 +307,7 @@ module.exports = {
   // delete
   getAndDeleteInstance: getAndDeleteInstance,
   deleteInstances: deleteInstances,
-  
+
   // embeddeddocument operations
   addEmbeddedDocument: addEmbeddedDocument,
   updateEmbeddedDocument: updateEmbeddedDocument,

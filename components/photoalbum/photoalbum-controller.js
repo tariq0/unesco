@@ -22,8 +22,7 @@ async function getAll(req, res, next) {
     const result = await getItemsPaginated(
       Photoalbum,
       {},
-      {},
-      {},
+      "",
       page,
       perpage
     );

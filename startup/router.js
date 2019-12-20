@@ -5,6 +5,7 @@ const departmentRouter = require("../components/department/department-router");
 const photoalbumRouter = require("../components/photoalbum/photoalbum-router");
 const publicationRouter = require("../components/publication/publication-router");
 const userRouter = require("../components/user/user-router");
+const newsRouter = require('../components/news/news-router');
 const errorHandler = require("../middlewares/error-middleware");
 
 module.exports = function(app) {
@@ -16,6 +17,7 @@ module.exports = function(app) {
   app.use("/api/departments", departmentRouter);
   app.use("/api/photoalbums", photoalbumRouter); //
   app.use("/api/publications", publicationRouter);
+  app.use("/api/news", newsRouter);
   app.use("/api/users", userRouter);
   app.use(errorHandler);
 };
