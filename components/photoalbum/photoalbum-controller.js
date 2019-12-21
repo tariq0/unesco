@@ -20,10 +20,10 @@ async function getAll(req, res, next) {
   try {
     const page = parseInt(req.query.page);
     const perpage = parseInt(req.query.perpage) || 1;
-
+    const order = {date: -1};
     const result = await getDocumentsPaginated(
       Photoalbum,
-      {},
+      order,
       "",
       page,
       perpage
@@ -44,11 +44,11 @@ async function getAllbyDepartment(req, res, next) {
   try {
     const page = parseInt(req.query.page);
     const perpage = parseInt(req.query.perpage) || 1;
-
+    const order = {date: -1};
     const result = await getDocumentsPaginatedFiltered(
       Photoalbum,
       { departmentId: req.params.id },
-      {},
+      order,
       "",
       page,
       perpage
@@ -82,7 +82,8 @@ async function create(req, res, next) {
       _id: req.body.departmentId
     });
     const photoalbum = await createDocument(Photoalbum, req.body);
-    res.json(photoalbum);
+    //res.json(photoalbum);
+    res.json({message: "created successfully"});
   } catch (err) {
     next(err);
   }
@@ -102,10 +103,12 @@ async function update(req, res, next) {
       "descriptionEn"
     ]);
     photoalbum.set(newData);
+
     if (images) photoalbum.images = images.concat(photoalbum.images);
 
     await photoalbum.save();
-    res.json(photoalbum);
+    //res.json(photoalbum);
+    res.json({message: "updated successfully"});
   } catch (err) {
     next(err);
   }
@@ -118,12 +121,13 @@ async function delete_(req, res, next) {
       _id: req.params.id
     });
     //removes image if its name is given as query string
-    if (req.query.name) {
-      await photoalbum.deleteImage(req.query.name);
+    if (req.query.image) {
+      await photoalbum.deleteImages(req.query.image);
       res.json({ message: "deleted successfully" });
     } else {
       await photoalbum.remove();
-      res.json(photoalbum);
+      //res.json(photoalbum);
+      res.json({ message: "deleted successfully" });
     }
   } catch (err) {
     next(err);

@@ -13,25 +13,38 @@ const imageStorage = multer.diskStorage({
 });
 
 const imageFilter = (req, file, cb) => {
-  //cb(null, true) to accept that file
   if (
     isStringInArray(file.mimetype, config.get("static.suppportedImgMimeType"))
   ) {
     cb(null, true);
+  } else {
+    const error = new Error();
+    error.name = "ValidationError";
+    error.message = "Invalid MIME type .";
+    cb(error);
   }
-  //cb(null, false) to rejectc it
-  //cb(new Error("I don't have a clue!"));
 };
 
 // to make upload functionality totally separate
 // i used save middleware to handle that.
 function imageSave(req, res, next) {
+  //console.log("req.files: ",req.files, "req.body: ", req.body);
   if (req.files) {
+
+    if (req.body.images) {
+      res.statusCode = 422;
+      const error = new Error();
+      error.name = "ValidationError";
+      error.message = "invalid image or file input.";
+      return next(error);
+    }
+    
     let images = [];
     req.files.forEach(file => {
       images.push(file.filename);
     });
     req.body[config.get("photoalbum.imgFieldName")] = images;
+    console.log("req.files: ", req.files, "req.body: ", req.body);
     //console.log(req.body.images ,req.files);
     next();
   } else {
@@ -57,11 +70,12 @@ const uploadImage = multer({
 async function clearImages(req) {
   // passed as call back for validator to remove
   // saved files if the req is not valid.
-  //console.log('clear image is called');
   if (req.files) {
     let images = req.files.map(file => file.filename);
     //console.log(req.files);
-    await deleteFiles(config.get("photoalbum.staticImgDir"), images);
+    if (images.length > 0) {
+      await deleteFiles(config.get("photoalbum.staticImgDir"), images);
+    }
   }
 }
 

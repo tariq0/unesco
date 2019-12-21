@@ -1,78 +1,72 @@
-
-const Joi = require('@hapi/joi');
+const Joi = require("@hapi/joi");
 
 const createValidationSchema = Joi.object({
-    nameAr: Joi.string()
+  nameAr: Joi.string()
     .min(3)
     .max(20)
     .required(),
 
-    nameEn: Joi.string()
+  nameEn: Joi.string()
     .min(3)
     .max(20)
     .required(),
 
-    descriptionAr: Joi.string()
+  descriptionAr: Joi.string()
     .min(3)
     .max(300)
     .required(),
 
-    descriptionEn: Joi.string()
+  descriptionEn: Joi.string()
     .min(3)
     .max(300)
     .required(),
 
-    departmentId: Joi.objectId()
-    .required(),
+  departmentId: Joi.objectId().required(),
 
-    images: Joi.array()
+  images: Joi.array()
     .items(
-        Joi.string().
-        pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, {name: 'images'}).required()
-        
-        ).required(),
-    
-    date: Joi.date()
+      Joi.string()
+        .pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, { name: "images" })
+        .required()
+    )
+    .required(),
 
+  date: Joi.date()
 });
 
 const updateValidationSchema = Joi.object({
-    nameAr: Joi.string()
+  nameAr: Joi.string()
     .min(3)
     .max(20),
-    
 
-    nameEn: Joi.string()
+  nameEn: Joi.string()
     .min(3)
     .max(20),
-    
 
-    descriptionAr: Joi.string()
+  descriptionAr: Joi.string()
     .min(3)
     .max(300),
 
-    descriptionEn: Joi.string()
+  descriptionEn: Joi.string()
     .min(3)
     .max(300),
 
-    images: Joi.array()
-    .items(
-        Joi.string().
-        pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, {name: 'images'}).required()), 
-
-}).or('nameAr', 'nameEn', 'descriptionAr', 'descriptionEn', 'images');
-
+  images: Joi.array().items(
+    Joi.string()
+      .pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, { name: "images" })
+      .required()
+  )
+})
+.min(1).message("empty request!!");
 
 const paramsValidationSchema = Joi.object({
-   id: Joi.objectId()
-   .message('invalid request parameters'),
+  id: Joi.objectId().message("invalid request parameters"),
 
-   pid: Joi.objectId()
-   .message('invalid request parameters')
+  pid: Joi.objectId().message("invalid request parameters")
 });
 
 module.exports = {
-    createValidationSchema: createValidationSchema,
-    updateValidationSchema: updateValidationSchema,
-    paramsValidationSchema: paramsValidationSchema
-}
+  createValidationSchema: createValidationSchema,
+  updateValidationSchema: updateValidationSchema,
+  paramsValidationSchema: paramsValidationSchema
+};
