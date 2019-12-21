@@ -10,18 +10,15 @@ const {
 } = require("../../services/crud");
 const config = require("config");
 
-// const imageDir = config.get("publication.staticImgDir");
-// const documentDir = config.get("publication.staticDocDir");
-// const imageFieldName = config.get("publication.imgFieldName");
-// const documentFieldName = config.get("publication.docFieldName");
 
 async function getAll(req, res, next) {
   const page = req.query.page;
   const perPage = req.query.perpage;
+  const order = {date: -1};
   try {
     const { pagination, data } = await getDocumentsPaginated(
       Publication,
-      {},
+      order,
       "",
       page,
       perPage
@@ -42,7 +39,8 @@ async function getAll(req, res, next) {
 async function create(req, res, next) {
   try {
     const result = await createDocument(Publication, req.body);
-    res.json(result);
+    //res.json(result);
+    res.json({message: "successfully created"});
   } catch (err) {
     next(err);
   }
@@ -65,13 +63,14 @@ async function update(req, res, next) {
     }
 
     if (req.body.documents) {
-      console.log(req.body.documents);
+      //console.log(req.body.documents);
       // adding documents in request to the data base
       publication.documents = publication.documents.concat(req.body.documents);
     }
     console.log();
     await publication.save();
-    res.json({ publication });
+    //res.json({ publication });
+    res.json({message: "successfully updated"});
     //
   } catch (err) {
     next(err);
@@ -87,17 +86,15 @@ async function delete_(req, res, next) {
     const publication = await getDocumentIfExist(Publication, {
       _id: req.params.id
     });
-    if (typeof query === "string") {
+    if (query) {
       await publication.removeDocuments(query);
       await publication.save();
-      res.json(publication);
-    } else if (Array.isArray(query)) {
-      await publication.removeDocuments(query);
-      await publication.save();
-      res.json(publication);
+      //res.json(publication);
+      res.json({message: "successfully deleted"});
     } else {
       await publication.remove();
-      res.json(publication);
+      //res.json(publication);
+      res.json({message: "successfully deleted"});
     }
   } catch (err) {
     next(err);
