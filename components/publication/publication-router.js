@@ -27,8 +27,7 @@ router.put(
 );
 router.delete("/:id", delete_);
 
-router.delete('/test', (req, res, next)=>{
-
+router.delete("/test", (req, res, next) => {
   res.json(req.query);
 });
 

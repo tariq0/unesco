@@ -1,7 +1,7 @@
 const multer = require("multer");
 const isStringInArray = require("../../../services/string-in-array");
 const config = require("config");
-const { deleteFiles , deleteFile} = require("../../../services/filesystem");
+const { deleteFiles, deleteFile } = require("../../../services/filesystem");
 
 const imageMimeType = config.get("static.suppportedImgMimeType");
 const documentMimeType = config.get("static.suppportedDocMimeType");
@@ -12,10 +12,21 @@ const documentFieldName = config.get("publication.docFieldName");
 
 const filesStorage = multer.diskStorage({
   destination: function(req, file, cb) {
-    if (isStringInArray(file.mimetype, imageMimeType)) {
+    if (
+      isStringInArray(file.mimetype, imageMimeType) &&
+      file.fieldname === imageFieldName
+    ) {
       cb(null, imageDir);
-    } else if (isStringInArray(file.mimetype, documentMimeType)) {
+    } else if (
+      isStringInArray(file.mimetype, documentMimeType) &&
+      file.fieldname === documentFieldName
+    ) {
       cb(null, documentDir);
+    } else {
+      const error = new Error();
+      error.message = "invalid fields MIME type please check your input";
+      error.name = "ValidationError";
+      cb(error);
     }
   },
   filename: function(req, file, cb) {
@@ -31,7 +42,10 @@ const filesFilter = (req, file, cb) => {
   ) {
     cb(null, true);
   } else {
-    cb(new Error("unsupported file MIME type"));
+    const error = new Error();
+    error.message = "unsupported file MIME type";
+    error.name = "ValidationError";
+    cb(error);
   }
 };
 
@@ -39,27 +53,33 @@ const filesFilter = (req, file, cb) => {
 // i used save middleware to handle that.
 function filesSave(req, res, next) {
   if (req.files) {
-
-    let image = undefined;
-    let documents = undefined;
-
-    if(req.files[imageFieldName]){
-      image = req.files[imageFieldName][0].filename;
+    // if there is files means request has encoded as form data
+    // if there is any data in file fields that i didnt set
+    // means its fake file
+    if (req.body[imageFieldName] || req.body[documentFieldName]) {
+      res.statusCode = 422;
+      const error = new Error();
+      error.name = "ValidationError";
+      error.message = "invalid image or file input.";
+      return next(error);
     }
-    
+
+    const image = req.files[imageFieldName];
+    const documents = req.files[documentFieldName];
+
+    if (image) {
+      req.body[imageFieldName] = req.files[imageFieldName][0].filename;
+    }
+
     //console.log(req.files[documentFieldName]);
-    if(req.files[documentFieldName]){
-      
-      documents = [];
+    if (documents) {
+      let docs = [];
       req.files[documentFieldName].forEach(file => {
-        documents.push(file.filename);
+        docs.push(file.filename);
       });
+
+      req.body[documentFieldName] = docs;
     }
-    
-    req.body[imageFieldName] = image;
-    req.body[documentFieldName] = documents;
-    
-    //console.log(req.body.image, req.body.documents ,req.files);
     next();
   } else {
     // if he send json with image extension but no file
@@ -71,7 +91,6 @@ function filesSave(req, res, next) {
       error.message = "invalid image or file input.";
       return next(error);
     }
-    //console.log(req.files);
     next();
   }
 }
@@ -90,9 +109,10 @@ async function clearFiles(req) {
     let documents = req.body[documentFieldName];
     let image = req.body[imageFieldName];
     //files = files.concat([req.body[imageFieldName]]);
-    await deleteFile(imageDir, image);
-    await deleteFiles(documentDir, documents);
+    if (image) await deleteFile(imageDir, image);
+    if (documents) await deleteFiles(documentDir, documents);
   }
+  return;
 }
 
 module.exports = {

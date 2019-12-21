@@ -67,6 +67,7 @@ function filesSave(req, res, next) {
 
     if (req.files[imageFieldName]) {
       image = req.files[imageFieldName][0].filename;
+      req.body[imageFieldName] = image;
     }
     //console.log(req.files[documentFieldName]);
     if (req.files[documentFieldName]) {
@@ -74,9 +75,10 @@ function filesSave(req, res, next) {
       req.files[documentFieldName].forEach(file => {
         documents.push(file.filename);
       });
+
+      req.body[documentFieldName] = documents;
     }
-    req.body[imageFieldName] = image;
-    req.body[documentFieldName] = documents;
+
     next();
   } else {
     // if he send json with image extension but no file

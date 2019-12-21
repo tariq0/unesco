@@ -1,60 +1,88 @@
-const Joi = require('@hapi/joi');
+const Joi = require("@hapi/joi");
 
 const createValidationSchema = Joi.object({
+  nameAr: Joi.string()
+    .min(3)
+    .max(30)
+    .required(),
+  nameEn: Joi.string()
+    .min(3)
+    .max(30)
+    .required(),
 
-    nameAr: Joi.string().min(3).max(30).required(),
-    nameEn: Joi.string().min(3).max(30).required(),
+  descriptionShortAr: Joi.string()
+    .min(3)
+    .max(500)
+    .required(),
+  descriptionShortEn: Joi.string()
+    .min(3)
+    .max(500)
+    .required(),
 
-    descriptionShortAr: Joi.string().min(3).max(500).required(),
-    descriptionShortEn: Joi.string().min(3).max(500).required(),
-  
-    descriptionLongAr: Joi.string().min(3).max(1000).required(),
-    descriptionLongEn: Joi.string().min(3).max(1000).required(),
- 
-    image: Joi.string().
-    pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, {name: 'image'}).required(),
+  descriptionLongAr: Joi.string()
+    .min(3)
+    .max(1000)
+    .required(),
+  descriptionLongEn: Joi.string()
+    .min(3)
+    .max(1000)
+    .required(),
 
-    documents: Joi.array()
+  image: Joi.string()
+    .pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, { name: "image" })
+    .required(),
+
+  documents: Joi.array()
     .items(
-        Joi.string().
-        pattern(/(\.pdf)$/, {name: 'documents'}).required()
-        
-        ).required(),
+      Joi.string()
+        .pattern(/(\.pdf)$/, { name: "documents" })
+        .required()
+    )
+    .required(),
 
-    date: Joi.date()
+  date: Joi.date()
 });
 
 const updateValidationSchema = Joi.object({
+  nameAr: Joi.string()
+    .min(3)
+    .max(30),
+  nameEn: Joi.string()
+    .min(3)
+    .max(30),
 
-    nameAr: Joi.string().min(3).max(30),
-    nameEn: Joi.string().min(3).max(30),
+  descriptionShortAr: Joi.string()
+    .min(3)
+    .max(500),
+  descriptionShortEn: Joi.string()
+    .min(3)
+    .max(500),
 
-    descriptionShortAr: Joi.string().min(3).max(500),
-    descriptionShortEn: Joi.string().min(3).max(500),
-  
-    descriptionLongAr: Joi.string().min(3).max(1000),
-    descriptionLongEn: Joi.string().min(3).max(1000),
- 
-    image: Joi.string().
-    pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, {name: 'image'}),
+  descriptionLongAr: Joi.string()
+    .min(3)
+    .max(1000),
+  descriptionLongEn: Joi.string()
+    .min(3)
+    .max(1000),
 
-    documents: Joi.array()
-    .items(
-        Joi.string().
-        pattern(/(\.pdf)$/, {name: 'documents'}).required()
-        
-        ),
+  image: Joi.string().pattern(/(\.png)|(\.jpg)|(\.jpeg)$/, { name: "image" }),
 
-    date: Joi.date()
-});
+  documents: Joi.array().items(
+    Joi.string()
+      .pattern(/(\.pdf)$/, { name: "documents" })
+      .required()
+  ),
+
+  date: Joi.date()
+}).min(1).message("empty request !!");
+
 
 const paramsValidationSchema = Joi.object({
-    id: Joi.objectId()
-    .message('invalid request parameters')
- });
+  id: Joi.objectId().message("invalid request parameters")
+});
 
 module.exports = {
-    createValidationSchema: createValidationSchema,
-    updateValidationSchema: updateValidationSchema,
-    paramsValidationSchema: paramsValidationSchema
-}
+  createValidationSchema: createValidationSchema,
+  updateValidationSchema: updateValidationSchema,
+  paramsValidationSchema: paramsValidationSchema
+};
