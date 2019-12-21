@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const config = require("config");
-const jwt = require('jsonwebtoken');
-
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema({
-  firstName: String, 
-  lastName: String, 
+  firstName: String,
+  lastName: String,
   password: String,
   phone: String,
   email: {
@@ -56,21 +55,20 @@ userSchema.statics.verifyToken = function(token) {
   }
 };
 
-userSchema.statics.createNewUser = async function (userdata){
-  const user = new UserModel(userdata);
+userSchema.statics.createNewUser = async function(userdata) {
+  const user = new User(userdata);
   await user.setPassword(userdata.password);
   await user.save();
   return user;
-}
+};
 
-userSchema.methods.updatePasword = async function(newPassword){
+userSchema.methods.updatePasword = async function(newPassword) {
   await this.setPassword(newPassword);
   const result = await this.save();
   return result;
-}
-
+};
 
 const User = mongoose.model("user", userSchema);
-module.exports ={ 
-  User: User,
-}
+module.exports = {
+  User: User
+};

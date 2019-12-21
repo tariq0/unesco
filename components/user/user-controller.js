@@ -3,10 +3,10 @@
 const { Verification } = require("./verify-token");
 const _ = require("lodash");
 const {
-  getItemBy,
-  getItemsPaginated,
-  getItemIfExist,
-  getAndDeleteInstance
+  getDocument,
+  getDocumentsPaginated,
+  getDocumentIfExist,
+  getAndDeleteDocument
 } = require("../../services/crud");
 const { User } = require("./user");
 const sendMail = require("../../services/mail");
@@ -17,7 +17,7 @@ async function getAll(req, res, next) {
     const page = parseInt(req.query.page);
     const perpage = parseInt(req.query.perpage) || 10;
 
-    const result = await getItemsPaginated(User, {}, {}, {}, page, perpage);
+    const result = await getDocumentsPaginated(User, {}, "", page, perpage);
     res.json(result);
   } catch (err) {
     next(err);
@@ -26,7 +26,7 @@ async function getAll(req, res, next) {
 
 async function getById(req, res, next) {
   try {
-    const result = await getItemBy(User, { _id: req.params.id });
+    const result = await getDocument(User, { _id: req.params.id });
     res.json(result);
   } catch (err) {
     next(err);
@@ -44,7 +44,7 @@ async function create(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const user = await getItemIfExist(User, { _id: req.params.id });
+    const user = await getDocumentIfExist(User, { _id: req.params.id });
     const newData = _.omit(req.body, ["password"]);
     user.set(newData);
     if (req.body.password) await user.setPassword(req.body.password);
@@ -58,7 +58,7 @@ async function update(req, res, next) {
 
 async function delete_(req, res, next) {
   try {
-    const result = await getAndDeleteInstance(User, { _id: req.params.id });
+    const result = await getAndDeleteDocument(User, { _id: req.params.id });
     res.json(result);
   } catch (err) {
     next(err);
@@ -68,7 +68,7 @@ async function delete_(req, res, next) {
 // common functionality
 async function signup(req, res, next) {
   try {
-    let user = await getItemBy(User, { email: req.body.email });
+    let user = await getDocument(User, { email: req.body.email });
     if (user) {
       const error = new Error();
       error.message = "user already exist";
@@ -103,7 +103,7 @@ async function verifyEmail(req, res, next) {
     if (userId) {
       // update user verified state.
       //await updateInstance(User, { _id: userId }, { isVerified: true });
-      const user = await getItemIfExist(User, { _id: userId });
+      const user = await getDocumentIfExist(User, { _id: userId });
       if (user.isVerified) {
         res.statusCode = 422;
         return res.json({ message: "you are already verified" });
@@ -128,7 +128,7 @@ async function resendVerificationMail(req, res, next) {
     // generate and send verification mail if user already existed and
     // is not verified.
 
-    const user = await getItemBy(User, { email: req.body.email });
+    const user = await getDocument(User, { email: req.body.email });
     if (!user) {
       const error = new Error();
       error.name = "NotFoundError";
@@ -160,7 +160,7 @@ async function resendVerificationMail(req, res, next) {
 
 async function login(req, res, next) {
   try {
-    const user = await getItemBy(User, { email: req.body.email });
+    const user = await getDocument(User, { email: req.body.email });
     if (!user || !(await user.verifyPassword(req.body.password))) {
       res.statusCode = 422;
       return res.json({ message: "email or password is not correct." });
@@ -187,7 +187,7 @@ async function forgotPassword(req, res, next) {
     // generate and send verification mail if user already existed and
     // is not verified.
 
-    const user = await getItemBy(User, { email: req.body.email });
+    const user = await getDocument(User, { email: req.body.email });
     if (!user) {
       const error = new Error();
       error.name = "ValidationError";
@@ -223,7 +223,7 @@ async function verifyNewPassword(req, res, next) {
 
     if (!userId) return res.json({ message: "token is not valid or expired" });
 
-    const user = await getItemIfExist(User, { _id: userId });
+    const user = await getDocumentIfExist(User, { _id: userId });
     await user.updatePasword(req.body.newPassword);
     await Verification.deleteToken(req.body.token);
     res.json({ message: "password changed successfulley" });

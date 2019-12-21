@@ -1,10 +1,12 @@
 const { Department, Subdepartment } = require("./department");
-const {
-  createInstance,
-  getAndUpdateInstance,
-  getAndDeleteInstance,
-  getItems,
-  getItemBy,
+const {//
+  //
+  createDocument,
+  getAndUpdateDocument,
+  getAndDeleteDocument,
+  getDocument,
+  getDocuments,
+  //
   addEmbeddedDocument,
   updateEmbeddedDocument,
   delteEmbeddedDocument
@@ -12,7 +14,7 @@ const {
 
 async function create(req, res, next) {
   try {
-    const department = await createInstance(Department, req.body);
+    const department = await createDocument(Department, req.body);
     res.send(department);
   } catch (err) {
     next(err);
@@ -21,7 +23,7 @@ async function create(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const department = await getAndUpdateInstance(
+    const department = await getAndUpdateDocument(
       Department,
       req.params.id,
       req.body
@@ -34,7 +36,7 @@ async function update(req, res, next) {
 
 async function getAll(req, res, next) {
   try {
-    const departments = await getItems(Department);
+    const departments = await getDocuments(Department);
     res.json(departments);
   } catch (err) {
     next(err);
@@ -43,7 +45,7 @@ async function getAll(req, res, next) {
 
 async function getById(req, res, next) {
   try {
-    const department = await getItemBy(Department, { _id: req.params.id });
+    const department = await getDocument(Department, { _id: req.params.id });
     res.json(department);
   } catch (err) {
     next(err);
@@ -52,7 +54,7 @@ async function getById(req, res, next) {
 
 async function delete_(req, res, next) {
   try {
-    const department = await getAndDeleteInstance(Department, req.params.id);
+    const department = await getAndDeleteDocument(Department, req.params.id);
     res.json({ message: "deleted successfully" });
   } catch (err) {
     console.log(err);

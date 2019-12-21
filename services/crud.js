@@ -1,14 +1,35 @@
 //
 const config = require("config");
 
-async function getItems(Model, filter, order, select) {
+//
+// get
+
+async function getDocument(Model, filter, select) {
+  return await Model.findOne(filter).select(select);
+}
+
+async function getDocumentIfExist(Model, filter, select) {
+  // throws error if not found
+  const result = await Model.findOne(filter).select(select);
+  if (!result) {
+    const error = new Error();
+    error.message = "not found error";
+    error.name = "NotFoundError";
+    throw error;
+  } else {
+    return result;
+  }
+}
+
+//
+async function getDocuments(Model, filter, order, select) {
   const result = await Model.find(filter)
     .sort(order)
     .select(select);
   return result;
 }
 
-async function getItemsPaginated(Model, order, select, page, perPage) {
+async function getDocumentsPaginated(Model, order, select, page, perPage) {
   // when getting all items it should be paginated.
 
   if (page <= 0) {
@@ -70,7 +91,7 @@ async function getItemsPaginated(Model, order, select, page, perPage) {
   };
 }
 
-async function getItemsPaginatedAndFiltered(
+async function getDocumentsPaginatedFiltered(
   Model,
   filter,
   order,
@@ -139,40 +160,27 @@ async function getItemsPaginatedAndFiltered(
   };
 }
 
-async function getItemBy(Model, filter, select) {
-  return await Model.findOne(filter).select(select);
-}
-
-async function getItemIfExist(Model, filter, select) {
-  // throws error if not found
-  const result = await Model.findOne(filter).select(select);
-  if (!result) {
-    const error = new Error();
-    error.message = "not found error";
-    error.name = "NotFoundError";
-    throw error;
-  } else {
-    return result;
-  }
-}
-
-async function getFilteredItemsCount(Model, filter) {
+async function filteredDocumentsCount(Model, filter) {
   const count = await Model.countDocuments(filter);
   return count;
 }
 
-async function getItemsCount(Model) {
+async function documentsCount(Model) {
   const count = await Model.estimatedDocumentCount();
   return count;
 }
 
-async function createInstance(Model, data) {
+// create
+
+async function createDocument(Model, data) {
   const instance = new Model(data);
   await instance.save();
   return instance;
 }
 
-async function getAndUpdateInstance(Model, id, data) {
+// update
+
+async function getAndUpdateDocument(Model, id, data) {
   // check if found then update
   // if not found throws error
   let item = await Model.findById(id);
@@ -187,13 +195,15 @@ async function getAndUpdateInstance(Model, id, data) {
   return item;
 }
 
-async function updateInstance(Model, filter, data) {
+async function updateDocument(Model, filter, data) {
   // updates document directly in data base
   const result = await Model.updateOne(filter, data);
   return result;
 }
 
-async function getAndDeleteInstance(Model, id) {
+// delete
+
+async function getAndDeleteDocument(Model, id) {
   let item = await Model.findById(id);
   if (!item) {
     const error = new Error();
@@ -205,9 +215,12 @@ async function getAndDeleteInstance(Model, id) {
   return item;
 }
 
-async function deleteInstances(Model, filter) {
+async function deleteDocuments(Model, filter) {
   await Model.deleteMany(filter);
 }
+
+//
+//
 
 // embedded document crud
 
@@ -288,25 +301,32 @@ async function delteEmbeddedDocument(
   return parent;
 }
 
+//
+//
+//
+//
+
 module.exports = {
   // get
-  getItems: getItems,
-  getItemsPaginated: getItemsPaginated,
-  getItemsPaginatedAndFiltered: getItemsPaginatedAndFiltered,
-  getItemBy: getItemBy,
-  getItemIfExist: getItemIfExist,
-  getItemsCount: getItemsCount,
-  getFilteredItemsCount: getFilteredItemsCount,
+  // get one
+  getDocument: getDocument,
+  getDocumentIfExist: getDocumentIfExist,
+  // get many
+  getDocuments: getDocuments,
+  getDocumentsPaginated: getDocumentsPaginated,
+  getDocumentsPaginatedFiltered: getDocumentsPaginatedFiltered,
+  // counting documents
+  documentsCount: documentsCount,
+  filteredDocumentsCount: filteredDocumentsCount,
 
-  //checkItemIfExist: checkItemIfExist,
   // create
-  createInstance: createInstance,
+  createDocument: createDocument,
   // update
-  getAndUpdateInstance: getAndUpdateInstance,
-  updateInstance: updateInstance,
+  getAndUpdateDocument: getAndUpdateDocument,
+  updateDocument: updateDocument,
   // delete
-  getAndDeleteInstance: getAndDeleteInstance,
-  deleteInstances: deleteInstances,
+  getAndDeleteDocument: getAndDeleteDocument,
+  deleteDocuments: deleteDocuments,
 
   // embeddeddocument operations
   addEmbeddedDocument: addEmbeddedDocument,

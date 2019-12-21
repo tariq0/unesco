@@ -37,9 +37,9 @@ newsShema.methods.replaceImage = async function(newImage) {
   //console.log(this);
 };
 
-newsShema.methods.addDocuments =  function(documents){
+newsShema.methods.addDocuments = function(documents) {
   this.documents = this.documents.concat(documents);
-}
+};
 
 newsShema.methods.removeDocuments = async function(documents) {
   if (typeof documents === "string") {
@@ -51,20 +51,20 @@ newsShema.methods.removeDocuments = async function(documents) {
     const diff = this.documents.filter(doc => !documents.includes(doc));
     this.documents = diff;
     await deleteFiles(documentDir, documents);
-  }else{
+  } else {
     const error = new Error();
     error.name = "FileSystemError";
-    error.message = "file names is not valid type"
+    error.message = "file names is not valid type";
+    throw error;
   }
 };
 
-newsShema.pre('remove',async function(){
-
-    if (this.image) await deleteFile(imageDir, this.image);
-    if(this.documents.length >0) await deleteFiles(documentDir, this.documents);
+newsShema.pre("remove", async function() {
+  if (this.image) await deleteFile(imageDir, this.image);
+  if (this.documents.length > 0) await deleteFiles(documentDir, this.documents);
 });
 
-const News = new mongoose.model('news', newsShema);
+const News = new mongoose.model("news", newsShema);
 module.exports = {
-    News: News
-}
+  News: News
+};
