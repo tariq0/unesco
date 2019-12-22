@@ -25,6 +25,25 @@ const subdepCreateValidationSchema = Joi.object({
     .required()
 });
 
+const subdepUpdateValidationSchema = Joi.object({
+  nameAr: Joi.string()
+    .min(3)
+    .max(20),
+
+  nameEn: Joi.string()
+    .min(3)
+    .max(20),
+
+  descriptionAr: Joi.string()
+    .min(3)
+    .max(300),
+
+  descriptionEn: Joi.string()
+    .min(3)
+    .max(300)
+})
+  .min(1)
+  .message("empty request !!");
 const depCreateValidationSchema = Joi.object({
   nameAr: Joi.string()
     .min(3)
@@ -46,11 +65,30 @@ const depCreateValidationSchema = Joi.object({
     .max(300)
     .required(),
 
-  // photoalbums: Joi.array()
-  // .items(Joi.objectId()),
-
   subdepartments: Joi.array().items(subdepCreateValidationSchema)
 });
+
+const depUpdateValidationSchema = Joi.object({
+  nameAr: Joi.string()
+    .min(3)
+    .max(20),
+
+  nameEn: Joi.string()
+    .min(3)
+    .max(20),
+
+  descriptionAr: Joi.string()
+    .min(3)
+    .max(300),
+
+  descriptionEn: Joi.string()
+    .min(3)
+    .max(300),
+
+  subdepartments: Joi.array().items(subdepCreateValidationSchema)
+})
+  .min(1)
+  .message("empty request !!");
 
 const paramsValidationSchema = Joi.object({
   id: Joi.objectId().message("invalid request parameters"),
@@ -60,6 +98,8 @@ const paramsValidationSchema = Joi.object({
 
 module.exports = {
   depCreateValidationSchema: depCreateValidationSchema,
+  depUpdateValidationSchema: depUpdateValidationSchema,
   subdepCreateValidationSchema: subdepCreateValidationSchema,
+  subdepUpdateValidationSchema: subdepUpdateValidationSchema,
   paramsValidationSchema: paramsValidationSchema
 };

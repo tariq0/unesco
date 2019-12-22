@@ -14,6 +14,8 @@ const {
 const {
   depCreateValidationSchema,
   subdepCreateValidationSchema,
+  depUpdateValidationSchema,
+  subdepUpdateValidationSchema,
   paramsValidationSchema
 } = require("./department-validator");
 
@@ -38,7 +40,12 @@ router.get(
 
 router.post("/", validator(depCreateValidationSchema), create);
 
-router.put("/:id", requestParamsValidator(paramsValidationSchema), update);
+router.put(
+  "/:id",
+  requestParamsValidator(paramsValidationSchema),
+  validator(depUpdateValidationSchema),
+  update
+);
 
 router.delete("/:id", requestParamsValidator(paramsValidationSchema), delete_);
 
@@ -52,6 +59,7 @@ router.post(
 router.put(
   "/:id/subdepartments/:sid",
   requestParamsValidator(paramsValidationSchema),
+  validator(subdepUpdateValidationSchema),
   updateSubdepartment
 );
 

@@ -272,7 +272,7 @@ async function updateEmbeddedDocument(
   return parent;
 }
 
-async function delteEmbeddedDocument(
+async function deleteEmbeddedDocument(
   ParentModel,
   parentId,
   childFieldName,
@@ -329,5 +329,5 @@ module.exports = {
   // embeddeddocument operations
   addEmbeddedDocument: addEmbeddedDocument,
   updateEmbeddedDocument: updateEmbeddedDocument,
-  delteEmbeddedDocument: delteEmbeddedDocument
+  deleteEmbeddedDocument: deleteEmbeddedDocument
 };

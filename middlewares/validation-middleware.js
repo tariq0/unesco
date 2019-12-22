@@ -12,7 +12,7 @@ function validator(validationSchema, cb) {
     if (result.error) {
       res.statusCode = 422;
       if (cb) await cb(req);
-      console.log(result.error);
+      //console.log(result.error);
       return res.send(result.error.details[0].message);
     } else next();
   };

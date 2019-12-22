@@ -1,5 +1,5 @@
 const { Department, Subdepartment } = require("./department");
-const {//
+const {
   //
   createDocument,
   getAndUpdateDocument,
@@ -9,13 +9,14 @@ const {//
   //
   addEmbeddedDocument,
   updateEmbeddedDocument,
-  delteEmbeddedDocument
+  deleteEmbeddedDocument
 } = require("../../services/crud");
 
 async function create(req, res, next) {
   try {
     const department = await createDocument(Department, req.body);
-    res.send(department);
+    //res.send(department);
+    res.json({message: "created successfully"});
   } catch (err) {
     next(err);
   }
@@ -28,7 +29,8 @@ async function update(req, res, next) {
       req.params.id,
       req.body
     );
-    res.send(department);
+    //res.send(department);
+    res.json({message: "updated successfully"});
   } catch (err) {
     next(err);
   }
@@ -57,7 +59,7 @@ async function delete_(req, res, next) {
     const department = await getAndDeleteDocument(Department, req.params.id);
     res.json({ message: "deleted successfully" });
   } catch (err) {
-    console.log(err);
+    //sconsole.log(err);
     next(err);
   }
 }
@@ -74,7 +76,8 @@ async function addSubdepartment(req, res, next) {
       req.body
     );
 
-    res.json(department);
+    //res.json(department);
+    res.json({message: "created successfully"});
   } catch (err) {
     next(err);
   }
@@ -90,7 +93,8 @@ async function updateSubdepartment(req, res, next) {
       req.params.sid,
       req.body
     );
-    res.json(department);
+    //res.json(department);
+    res.json({message: "updated successfully"});
   } catch (err) {
     next(err);
   }
@@ -98,14 +102,15 @@ async function updateSubdepartment(req, res, next) {
 
 async function deleteSubdepartment(req, res, next) {
   try {
-    const department = await delteEmbeddedDocument(
+    const department = await deleteEmbeddedDocument(
       Department,
       req.params.id,
       "subdepartments",
       req.params.sid
     );
 
-    res.json(department);
+    //res.json(department);
+    res.json({message: "deleted  successfully"});
   } catch (err) {
     //console.log(err);
     next(err);
