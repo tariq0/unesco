@@ -13,6 +13,15 @@ const _ = require("lodash");
 const imageURL = config.get("news.staticImgUrl");
 const documentsURL = config.get("news.staticDocUrl");
 
+class NewsFilter {
+
+  constructor(departmentId, organization, category){
+    this.departmentId = departmentId;
+    if(organization)this.organization = organization;
+    if(category)this.category = category; 
+  }
+}
+
 async function getAll(req, res, next) {
   // gets all by this year if found
   // or gets all (archive) if no records for this year
@@ -47,7 +56,14 @@ async function getAll(req, res, next) {
         page,
         perPage
       );
-      res.json(result);
+      //res.json(result);
+      const { pagination, data } = result;
+      res.json({
+        pagination: pagination,
+        data: data,
+        imageURL: imageURL,
+        documentsURL: documentsURL
+      });
     } else {
       console.log("inside news for the current year!");
       const result = await getDocumentsPaginatedFiltered(
@@ -58,7 +74,14 @@ async function getAll(req, res, next) {
         page,
         perPage
       );
-      res.json(result);
+      //res.json(result);
+      const { pagination, data } = result;
+      res.json({
+        pagination: pagination,
+        data: data,
+        imageURL: imageURL,
+        documentsURL: documentsURL
+      });
     }
   } catch (err) {
     next(err);
@@ -68,13 +91,16 @@ async function getAll(req, res, next) {
 //
 //
 
-async function getAllBy(req, res, next) {
+async function getAllByDepartment(req, res, next) {
   try {
     const page = req.query.page;
     const perPage = req.query.perpage;
     const order = { date: -1 };
     // this id is department id
-    const filter = { deparmentId: req.params.id };
+    const category = req.query.category;
+    const organization = req.query.organization;
+    const filter = new NewsFilter(req.params.id, organization, category);
+    //console.log(filter);
     const result = await getDocumentsPaginatedFiltered(
       News,
       filter,
@@ -84,7 +110,14 @@ async function getAllBy(req, res, next) {
       perPage
     );
 
-    res.json(result);
+    //res.json(result);
+    const { pagination, data } = result;
+    res.json({
+      pagination: pagination,
+      data: data,
+      imageURL: imageURL,
+      documentsURL: documentsURL
+    });
   } catch (err) {
     next(err);
   }
@@ -148,7 +181,7 @@ async function delete_(req, res, next) {
 
 module.exports = {
   getAll: getAll,
-  getAllBy: getAllBy,
+  getAllByDepartment: getAllByDepartment,
   create: create,
   update: update,
   delete_: delete_

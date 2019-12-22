@@ -22,9 +22,5 @@ router.put(
 );
 router.delete("/:id", delete_);
 
-// router.delete("/test/test", (req, res, next)=>{
-
-//   res.json({query: req.query, body: req.body});
-// });
 
 module.exports = router;

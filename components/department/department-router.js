@@ -1,5 +1,5 @@
 const express = require("express");
-
+// CRUD
 const {
   create,
   update,
@@ -10,7 +10,7 @@ const {
   updateSubdepartment,
   deleteSubdepartment
 } = require("./department-controller");
-
+// Validation Schemas
 const {
   depCreateValidationSchema,
   subdepCreateValidationSchema,
@@ -18,13 +18,15 @@ const {
   subdepUpdateValidationSchema,
   paramsValidationSchema
 } = require("./department-validator");
-
+// Validation Middlewares
 const {
   validator,
   requestParamsValidator
 } = require("../../middlewares/validation-middleware");
+// external controllers
+const  photoController  = require("../photoalbum/photoalbum-controller");
+const newsController = require("../news/news-controller");
 
-const { getAllbyDepartment } = require("../photoalbum/photoalbum-controller");
 
 const router = express.Router();
 
@@ -35,7 +37,13 @@ router.get("/:id", requestParamsValidator(paramsValidationSchema), getById);
 router.get(
   "/:id/photoalbums",
   requestParamsValidator(paramsValidationSchema),
-  getAllbyDepartment
+  photoController.getAllbyDepartment
+);
+
+router.get(
+  "/:id/news",
+  requestParamsValidator(paramsValidationSchema),
+  newsController.getAllByDepartment
 );
 
 router.post("/", validator(depCreateValidationSchema), create);

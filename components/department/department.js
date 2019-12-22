@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const config = require("config");
-const { PhotoalbumModel } = require("../photoalbum/photoalbum");
+const { Photoalbum } = require("../photoalbum/photoalbum");
+const { News } = require("../news/news");
 const { deleteFiles } = require("../../services/filesystem");
 
 const subdepartmentSchema = new mongoose.Schema({
@@ -26,14 +27,27 @@ departmentSchema.pre("remove", async function() {
   // removing related photoalbums.
   // getting list of all files on the file system
   // and removing them.
-  let listOfFiles = await PhotoalbumModel.find({
+  let listOfFiles = await Photoalbum.find({
     departmentId: this._id
   }).select("images");
 
   listOfFiles = listOfFiles.map(obj => obj.images);
   listOfFiles = listOfFiles.concat.apply([], listOfFiles);
-  await PhotoalbumModel.deleteMany({ departmentId: this._id });
-  await deleteFiles(config.get("static.staticImgDir"), listOfFiles);
+
+  let newsFiles = await News.find({departmentId: this._id})
+  .select("image documents");
+  const newsImages = newsFiles.map(obj => obj.image);
+  let newsArrayOfDocumentsArray = newsFiles.map(obj => obj.documents);
+  const newsDocuments = newsArrayOfDocumentsArray.concat.apply([], newsArrayOfDocumentsArray);
+
+  
+
+  await Photoalbum.deleteMany({ departmentId: this._id });
+  await News.deleteMany({ departmentId: this._id });
+
+  await deleteFiles(config.get("photoalbum.staticImgDir"), listOfFiles);
+  await deleteFiles(config.get("news.staticImgDir"), newsImages);
+  await deleteFiles(config.get("news.staticDocDir"), newsDocuments);
 });
 
 const Department = mongoose.model("Department", departmentSchema);
