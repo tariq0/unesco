@@ -6,6 +6,7 @@ const {
   getAndDeleteDocument,
   getDocument,
   getDocuments,
+  getDocumentsPaginated,
   //
   addEmbeddedDocument,
   updateEmbeddedDocument,
@@ -38,8 +39,18 @@ async function update(req, res, next) {
 
 async function getAll(req, res, next) {
   try {
-    const departments = await getDocuments(Department);
+    if(req.query.page){
+
+      const page = parseInt(req.query.page);
+      const perPage = parseInt(req.query.perpage);
+      const result = await getDocumentsPaginated(
+        Department, {},"",page, perPage
+      );
+        res.json(result);
+    }else{
+      const departments = await getDocuments(Department);
     res.json(departments);
+    }
   } catch (err) {
     next(err);
   }

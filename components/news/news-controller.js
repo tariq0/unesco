@@ -28,8 +28,8 @@ async function getAll(req, res, next) {
   // or archive is required.
   try {
     const archive = req.query.archive;
-    const page = req.query.page;
-    const perPage = req.query.perpage;
+    const page = parseInt(req.query.page);
+      const perPage = parseInt(req.query.perpage);
 
     const order = { date: -1 };
 
@@ -93,8 +93,8 @@ async function getAll(req, res, next) {
 
 async function getAllByDepartment(req, res, next) {
   try {
-    const page = req.query.page;
-    const perPage = req.query.perpage;
+    const page = parseInt(req.query.page);
+      const perPage = parseInt(req.query.perpage);
     const order = { date: -1 };
     // this id is department id
     const category = req.query.category;

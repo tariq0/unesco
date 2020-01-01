@@ -12,8 +12,8 @@ const config = require("config");
 
 
 async function getAll(req, res, next) {
-  const page = req.query.page;
-  const perPage = req.query.perpage;
+  const page = parseInt(req.query.page);
+      const perPage = parseInt(req.query.perpage);
   const order = {date: -1};
   try {
     const { pagination, data } = await getDocumentsPaginated(
