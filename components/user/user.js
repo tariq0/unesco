@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   },
   facebookId: String,
   birthDate: Date,
+  gender: String,
   job: String,
   role: { type: String, default: "user" },
   isVerified: { type: Boolean, default: false }
