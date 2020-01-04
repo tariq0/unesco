@@ -16,8 +16,9 @@ async function getAll(req, res, next) {
   try {
     const page = parseInt(req.query.page);
     const perpage = parseInt(req.query.perpage) || 10;
+    const order = {_id: -1};
 
-    const result = await getDocumentsPaginated(User, {}, "", page, perpage);
+    const result = await getDocumentsPaginated(User, order, "", page, perpage);
     res.json(result);
   } catch (err) {
     next(err);

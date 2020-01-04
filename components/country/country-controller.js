@@ -12,7 +12,13 @@ const Country = require("./country");
 async function getAll(req, res, next) {
   try {
 
-    if( req.query.page){
+    if(req.query.name){
+      const filter = {name: req.query.name};
+      const result = await getDocument(Country, filter);
+      res.json(result);
+    }
+
+    else if( req.query.page){
       const page = parseInt(req.query.page);
     const perPage = parseInt(req.query.perpage);
 

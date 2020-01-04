@@ -43,8 +43,9 @@ async function getAll(req, res, next) {
 
       const page = parseInt(req.query.page);
       const perPage = parseInt(req.query.perpage);
+      const order = {_id: -1};
       const result = await getDocumentsPaginated(
-        Department, {},"",page, perPage
+        Department, order,"",page, perPage
       );
         res.json(result);
     }else{
