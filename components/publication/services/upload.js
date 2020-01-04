@@ -42,6 +42,7 @@ const filesFilter = (req, file, cb) => {
   ) {
     cb(null, true);
   } else {
+    console.log(file);
     const error = new Error();
     error.message = "unsupported file MIME type";
     error.name = "ValidationError";

@@ -50,7 +50,8 @@
     "suppportedDocMimeType": [
       "application/pdf",
       "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/wps-office.pdf"
     ]
   },
   "publication": {
@@ -64,7 +65,7 @@
   "static": {
     "staticRootDir": "./public",
     "suppportedImgMimeType": ["image/png", "image/jpg", "image/jpeg"],
-    "suppportedDocMimeType": ["application/pdf"]
+    "suppportedDocMimeType": ["application/pdf","application/wps-office.pdf"]
   },
   "pagination": {
     "maxPerPage": 10,
