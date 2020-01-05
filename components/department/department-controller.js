@@ -88,8 +88,8 @@ async function addSubdepartment(req, res, next) {
       req.body
     );
 
-    //res.json(department);
-    res.json({message: "created successfully"});
+    res.json(department);
+    //res.json({message: "created successfully"});
   } catch (err) {
     next(err);
   }

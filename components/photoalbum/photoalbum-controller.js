@@ -15,12 +15,13 @@ const {
   getDocumentIfExist
 } = require("../../services/crud");
 
+const imageURL = config.get("photoalbum.staticImgUrl");
 //
 async function getAll(req, res, next) {
   try {
     const page = parseInt(req.query.page);
     const perpage = parseInt(req.query.perpage) || 1;
-    const order = {date: -1};
+    const order = { date: -1 };
     const result = await getDocumentsPaginated(
       Photoalbum,
       order,
@@ -29,7 +30,7 @@ async function getAll(req, res, next) {
       perpage
     );
     const { pagination, data } = result;
-    const URL = config.get("photoalbum.staticImgUrl");
+    const URL = imageURL;
     res.json({
       URL: URL,
       pagination: pagination,
@@ -44,7 +45,7 @@ async function getAllbyDepartment(req, res, next) {
   try {
     const page = parseInt(req.query.page);
     const perpage = parseInt(req.query.perpage) || 1;
-    const order = {date: -1};
+    const order = { date: -1 };
     const result = await getDocumentsPaginatedFiltered(
       Photoalbum,
       { departmentId: req.params.id },
@@ -54,7 +55,7 @@ async function getAllbyDepartment(req, res, next) {
       perpage
     );
     const { pagination, data } = result;
-    const URL = config.get("photoalbum.staticImgUrl");
+    const URL = imageURL;
     res.json({
       URL: URL,
       pagination: pagination,
@@ -68,7 +69,11 @@ async function getAllbyDepartment(req, res, next) {
 //
 async function getById(req, res, next) {
   try {
-    const photoalbum = await getDocument(Photoalbum, { _id: req.body.pid });
+    let photoalbum = await getDocument(Photoalbum, { _id: req.params.id });
+    photoalbum =photoalbum.toObject();
+    photoalbum["URL"] = imageURL;
+    //photoalbum.URL = imageURL;
+    //console.log(imageURL, photoalbum);
     res.json(photoalbum);
   } catch (err) {
     next(err);
@@ -83,7 +88,7 @@ async function create(req, res, next) {
     });
     const photoalbum = await createDocument(Photoalbum, req.body);
     //res.json(photoalbum);
-    res.json({message: "created successfully"});
+    res.json({ message: "created successfully" });
   } catch (err) {
     next(err);
   }
@@ -108,7 +113,7 @@ async function update(req, res, next) {
 
     await photoalbum.save();
     //res.json(photoalbum);
-    res.json({message: "updated successfully"});
+    res.json({ message: "updated successfully" });
   } catch (err) {
     next(err);
   }

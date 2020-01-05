@@ -1,7 +1,7 @@
 //
 const router = require("express").Router();
 const { clearImages, uploadImage} = require("./services/upload");
-const { getAll, create, delete_, update } = require("./photoalbum-controller");
+const { getAll, getById,create, delete_, update } = require("./photoalbum-controller");
 
 const {
   createValidationSchema,
@@ -17,7 +17,7 @@ const {
 
 
 router.get("/", getAll);
-router.get("/:id");
+router.get("/:id", getById);
 
 router.post(
   "/",
