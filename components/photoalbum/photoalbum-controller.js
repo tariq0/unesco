@@ -112,8 +112,10 @@ async function update(req, res, next) {
     if (images) photoalbum.images = images.concat(photoalbum.images);
 
     await photoalbum.save();
-    //res.json(photoalbum);
-    res.json({ message: "updated successfully" });
+    photoalbum = photoalbum.toObject();
+    photoalbum["URL"] = imageURL;
+    res.json(photoalbum);
+    //res.json({ message: "updated successfully" });
   } catch (err) {
     next(err);
   }
@@ -128,7 +130,10 @@ async function delete_(req, res, next) {
     //removes image if its name is given as query string
     if (req.query.image) {
       await photoalbum.deleteImages(req.query.image);
-      res.json({ message: "deleted successfully" });
+      photoalbum = photoalbum.toObject();
+      photoalbum["URL"] = imageURL;
+      res.json(photoalbum);
+      //res.json({ message: "deleted successfully" });
     } else {
       await photoalbum.remove();
       //res.json(photoalbum);
