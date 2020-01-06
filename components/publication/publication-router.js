@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { getAll, create, update, delete_ } = require("./publication-controller");
+const { getAll, getById,create, update, delete_ } = require("./publication-controller");
 const {
   createValidationSchema,
   updateValidationSchema,
@@ -12,6 +12,7 @@ const {
 const { uploadFiles, clearFiles } = require("./services/upload");
 
 router.get("/", getAll);
+router.get("/:id",requestParamsValidator(paramsValidationSchema), getById);
 router.post(
   "/",
   uploadFiles,

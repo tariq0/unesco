@@ -5,10 +5,13 @@ const {
   //
   getDocumentsPaginated,
   createDocument,
-  getDocumentIfExist
+  getDocumentIfExist,
+  getDocument
   //
 } = require("../../services/crud");
 const config = require("config");
+const docsURL = config.get("publication.staticDocUrl");
+const imgURL = config.get("publication.staticImgUrl");
 
 
 async function getAll(req, res, next) {
@@ -23,8 +26,8 @@ async function getAll(req, res, next) {
       page,
       perPage
     );
-    const documentsURL = config.get("publication.staticImgUrl");
-    const imageURL = config.get("publication.staticDocUrl");
+    const documentsURL = docsURL;
+    const imageURL = imgURL;
     res.json({
       pagination: pagination,
       data: data,
@@ -32,6 +35,19 @@ async function getAll(req, res, next) {
       imageURL: imageURL
     });
   } catch (err) {
+    next(err);
+  }
+}
+
+async function getById(req, res, next){
+  try{
+    let publication = await getDocument(Publication, {_id:req.params.id});
+    publication = publication.toObject();
+    publication["imageURL"] = imgURL;
+    publication["documentsURL"] = docsURL;
+    //console.log(publication);
+    res.json(publication);
+  }catch(err){
     next(err);
   }
 }
@@ -50,7 +66,7 @@ async function update(req, res, next) {
   try {
     // update data if given
     console.log("inside update", req.body.documents);
-    const publication = await getDocumentIfExist(Publication, {
+    let publication = await getDocumentIfExist(Publication, {
       _id: req.params.id
     });
 
@@ -67,10 +83,13 @@ async function update(req, res, next) {
       // adding documents in request to the data base
       publication.documents = publication.documents.concat(req.body.documents);
     }
-    console.log();
+    //console.log();
     await publication.save();
-    //res.json({ publication });
-    res.json({message: "successfully updated"});
+    publication =publication.toObject();
+    publication["imageURL"] = imgURL;
+    publication["documentsURL"] = docsURL;
+    res.json(publication);
+    //res.json({message: "successfully updated"});
     //
   } catch (err) {
     next(err);
@@ -83,14 +102,17 @@ async function delete_(req, res, next) {
     // file from the document if there is no query string
     // then its order to remove the document
     const query = req.query.document;
-    const publication = await getDocumentIfExist(Publication, {
+    let publication = await getDocumentIfExist(Publication, {
       _id: req.params.id
     });
     if (query) {
       await publication.removeDocuments(query);
       await publication.save();
-      //res.json(publication);
-      res.json({message: "successfully deleted"});
+      publication =publication.toObject();
+      publication["imageURL"] = imgURL;
+      publication["documentsURL"] = docsURL;
+      res.json(publication);
+      //res.json({message: "successfully deleted"});
     } else {
       await publication.remove();
       //res.json(publication);
@@ -103,6 +125,7 @@ async function delete_(req, res, next) {
 
 module.exports = {
   getAll: getAll,
+  getById: getById,
   create: create,
   update: update,
   delete_: delete_
